@@ -192,17 +192,44 @@ a:visited, a:hover, a:active { color:white; }
 <script>
 /* ALERT */
 window.addEventListener('load', () => {
-  alert('Consejo: En dispositivos táctiles use los laterales para poder desplazarse por la página.°');
+  alert('Consejo: En dispositivos táctiles use los laterales para poder desplazarse por la página.');
 });
 
 /* PANORAMAS */
-const panoramas = [
-  {id:'pano1', img:'https://i.postimg.cc/pR1KfbCF/malla-cuadricula-cuadrados-repetible-costura-patron-papel-trazado-grafico-grategrating-celosia-regul.jpg'}
-  /* AÑADIR COMA EN LAS LLAVES ANTERIORES
-  USAR: }, EXCEPTO EL ÚLTIMO, RENOMBRAR PANO Y ACTUALIZAR EN EL PANO */
-];
+  const panoramas = [
+    {id:'pano1', img:'https://i.postimg.cc/pR1KfbCF/malla-cuadricula-cuadrados-repetible-costura-patron-papel-trazado-grafico-grategrating-celosia-regul.jpg'}
+    // puedes añadir más panoramas
+  ];
 
-const viewers = {};
+  const viewers = {};
+
+  const observer = new IntersectionObserver((entries, obs) => {
+    entries.forEach(entry => {
+      if(entry.isIntersecting){
+        const p = panoramas.find(pano => pano.id === entry.target.id);
+        if(p && !viewers[p.id]){
+          viewers[p.id] = pannellum.viewer(p.id, {
+            type: "equirectangular",
+            panorama: p.img,
+            autoLoad: true,
+            showZoomCtrl: true,
+            showFullscreenCtrl: true,
+            dragPanEnabled: true,
+            mouseZoom: true,
+            keyboardZoom: true,
+            touchPanSpeed: 0
+          });
+          entry.target.style.animationDelay = `${0.1 * panoramas.indexOf(p)}s`;
+          obs.unobserve(entry.target); // deja de observarlo una vez cargado
+        }
+      }
+    });
+  }, {threshold: 0.1}); // 10% visible para activar
+
+  panoramas.forEach(p => {
+    const el = document.getElementById(p.id);
+    observer.observe(el); // observa cada contenedor
+  });
 
 panoramas.forEach((p,i)=>{
   viewers[p.id] = pannellum.viewer(p.id,{
