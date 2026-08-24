@@ -167,6 +167,59 @@ main {
   animation: popUp .5s forwards ease-out;
 }
 
+/* ==========================================
+   INDICADOR DE NOVEDAD PARA PANORAMAS
+   ========================================== */
+
+.pano-container.indicador-id {
+    position: relative !important;
+}
+
+.pano-container.indicador-id::after {
+    content: "";
+    position: absolute;
+
+    width: 10px;
+    height: 10px;
+
+    top: 8px;
+    right: 8px;
+
+    background: var(--color-novedad);
+
+    border-radius: 50%;
+
+    z-index: 9999;
+    pointer-events: none;
+
+    /* ANIMACIÓN */
+    animation: puntoNovedad 1.5s ease-in-out infinite;
+
+    /* RESPLANDOR */
+    box-shadow:
+        0 0 6px rgba(255,255,255,.8),
+        0 0 12px var(--color-novedad);
+}
+
+
+/* ==========================================
+   ANIMACIÓN DEL PUNTO
+   ========================================== */
+
+@keyframes puntoNovedad {
+
+    0%, 100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+
+    50% {
+        transform: scale(1.4);
+        opacity: .65;
+    }
+
+}
+
 @keyframes popUp {
   to { opacity:1; transform:scale(1); }
 }
@@ -215,6 +268,60 @@ footer.is-hot::before {
 
 a { text-decoration:none; color:white; }
 a:visited, a:hover, a:active { color:white; }
+
+
+/* ESTILO NOVEDADES */
+
+.palabra-marcada {
+    position: relative !important;
+    display: inline-block !important;
+}
+
+.punto-novedad {
+    position: absolute !important;
+
+    width: 8px !important;
+    height: 8px !important;
+
+    min-width: 8px !important;
+    min-height: 8px !important;
+    max-width: 8px !important;
+    max-height: 8px !important;
+
+    aspect-ratio: 1 / 1 !important;
+
+    display: block !important;
+
+    padding: 0 !important;
+    margin: 0 !important;
+
+    border: 0 !important;
+    border-radius: 50% !important;
+
+    top: -6px !important;
+    right: -9px !important;
+
+    box-sizing: border-box !important;
+
+    box-shadow: none !important;
+
+    line-height: 0 !important;
+
+    pointer-events: none !important;
+}
+
+/* Indicador para elementos por ID */
+
+.indicador-id {
+    position: relative !important;
+}
+
+.indicador-id > .punto-novedad {
+    top: -6px !important;
+    right: -6px !important;
+}
+
+
 </style>
 </head>
 
@@ -258,7 +365,7 @@ window.addEventListener('load', () => {
 /* PANORAMAS */
   const panoramas = [
     {id:'pano1', img:'https://i.postimg.cc/pR1KfbCF/malla-cuadricula-cuadrados-repetible-costura-patron-papel-trazado-grafico-grategrating-celosia-regul.jpg'}
-    // añadir más panoramas, actualizar la otra sección ( }, siempre wue haya anteriores.)
+    // añadir más panoramas, actualizar la otra sección ( }, siempre que haya anteriores.)
   ];
 
   const viewers = {};
@@ -363,4 +470,83 @@ bindReactiveLight(document.getElementById('footer'));
 </script>
 
 </body>
+
+<script>
+
+/*
+==================================================
+    🔴🟢🔵 INDICADORES NOVEDADES
+==================================================
+*/
+
+marcarID("pano1", "#ff0000", "01/01/2026");
+
+/*
+==================================================
+    FUNCIÓN marcarID()
+==================================================
+*/
+
+function marcarID(id, color, fechaCaducidad) {
+
+    const elemento = document.getElementById(id);
+
+    /* Si no existe el elemento, salir */
+    if (!elemento) {
+        return;
+    }
+
+
+    /*
+    ----------------------------------------------
+    Comprobar fecha de caducidad
+    ----------------------------------------------
+    */
+
+    if (fechaCaducidad) {
+
+        const partes = fechaCaducidad.split("/");
+
+        const dia = parseInt(partes[0], 10);
+        const mes = parseInt(partes[1], 10) - 1;
+        const año = parseInt(partes[2], 10);
+
+        const caducidad = new Date(
+            año,
+            mes,
+            dia + 1,
+            0,
+            0,
+            0
+        );
+
+        const ahora = new Date();
+
+        /*
+        Si ya ha caducado, no mostrar indicador
+        */
+
+        if (ahora >= caducidad) {
+            return;
+        }
+    }
+
+
+    /*
+    ----------------------------------------------
+    Activar indicador
+    ----------------------------------------------
+    */
+
+    elemento.classList.add("indicador-id");
+
+    elemento.style.setProperty(
+        "--color-novedad",
+        color
+    );
+
+}
+
+</script>
+
 </html>
